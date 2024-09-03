@@ -575,6 +575,17 @@ class ArchSpec:
     def __contains__(self, string):
         return string in str(self) or string in self.target
 
+    def complete_with_defaults(self) -> None:
+        default_architecture = spack.spec.ArchSpec.default_arch()
+        if not self.platform:
+            self.platform = default_architecture.platform
+
+        if not self.os:
+            self.os = default_architecture.os
+
+        if not self.target:
+            self.target = default_architecture.target
+
 
 class CompilerSpec:
     """The CompilerSpec field represents the compiler or range of compiler

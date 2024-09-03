@@ -33,6 +33,3 @@
 #heuristic attr("node_target", node(PackageID, Package), Target) : target_weight(Target, Weight), attr("node", node(PackageID, Package)). [ 2, factor]
 #heuristic attr("node_target", node(PackageID, Package), Target) : target_weight(Target,      0), attr("node", node(PackageID, Package)). [ 1, sign]
 #heuristic attr("node_target", node(PackageID, Package), Target) : target_weight(Target, Weight), attr("node", node(PackageID, Package)), Weight > 0. [-1, sign]
-
-% Use the default compilers
-#heuristic node_compiler(node(PackageID, Package), ID) : compiler_weight(ID, 0), compiler_id(ID), attr("node", node(PackageID, Package)). [30, init]

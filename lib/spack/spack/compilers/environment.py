@@ -24,6 +24,8 @@ class LibcDetector:
     def __init__(self, compiler_spec: "spack.spec.Spec"):
         assert compiler_spec.external, "only external compiler specs are allowed, so far"
         self.spec = compiler_spec.copy()
+        if self.spec.architecture:
+            self.spec.architecture.complete_with_defaults()
         self.spec._finalize_concretization()
 
     @contextlib.contextmanager
@@ -76,13 +78,16 @@ class LibcDetector:
                 )
             cc_exe = spack.util.executable.Executable(cc)
 
+            # FIXME (compiler as nodes): this operation should be encapsulated somewhere else
             compiler_flags = self.spec.extra_attributes.get("flags", {})
             for flag_type in [
                 "cflags" if cc == compiler_pkg.cc else "cxxflags",
                 "cppflags",
                 "ldflags",
             ]:
-                cc_exe.add_default_arg(*compiler_flags.get(flag_type, []))
+                current_flags = compiler_flags.get(flag_type, "").strip()
+                if current_flags:
+                    cc_exe.add_default_arg(*current_flags.split(" "))
 
             with self.compiler_environment():
                 return cc_exe("-v", fin, "-o", fout, output=str, error=str)
