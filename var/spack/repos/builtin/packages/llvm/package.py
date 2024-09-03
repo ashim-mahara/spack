@@ -301,6 +301,9 @@ class Llvm(CMakePackage, CudaPackage, LlvmDetection, CompilerPackage):
     provides("libllvm@4", when="@4.0.0:4")
     provides("libllvm@3", when="@3.0.0:3")
 
+    provides("c", "cxx", when="+clang")
+    provides("fortran", when="+flang")
+
     extends("python", when="+python")
 
     # Build dependency

@@ -29,8 +29,6 @@ class GccRuntime(Package):
 
     license("GPL-3.0-or-later WITH GCC-exception-3.1")
 
-    requires("%gcc")
-
     LIBRARIES = [
         "asan",
         "atomic",
@@ -54,6 +52,8 @@ class GccRuntime(Package):
     provides("libgfortran@5", when="%gcc@8:")
 
     depends_on("libc", type="link", when="platform=linux")
+
+    depends_on("gcc", type="build")
 
     def install(self, spec, prefix):
         if spec.platform in ["linux", "freebsd"]:
