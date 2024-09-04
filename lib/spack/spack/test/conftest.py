@@ -38,6 +38,7 @@ import spack.caches
 import spack.cmd.buildcache
 import spack.compiler
 import spack.compilers
+import spack.compilers.environment
 import spack.config
 import spack.database
 import spack.directory_layout
@@ -56,6 +57,7 @@ import spack.test.cray_manifest
 import spack.util.executable
 import spack.util.git
 import spack.util.gpg
+import spack.util.libc
 import spack.util.parallel
 import spack.util.spack_yaml as syaml
 import spack.util.url as url_util
@@ -2033,15 +2035,11 @@ repo:
 def compiler_factory():
     """Factory for a compiler dict, taking a spec and an OS as arguments."""
 
-    def _factory(*, spec, operating_system):
+    def _factory(*, spec):
         return {
-            "compiler": {
-                "spec": spec,
-                "operating_system": operating_system,
-                "paths": {"cc": "/path/to/cc", "cxx": "/path/to/cxx", "f77": None, "fc": None},
-                "modules": [],
-                "target": str(archspec.cpu.host().family),
-            }
+            "spec": f"{spec}",
+            "prefix": "/path",
+            "extra_attributes": {"compilers": {"c": "/path/bin/cc", "cxx": "/path/bin/cxx"}},
         }
 
     return _factory
@@ -2057,6 +2055,10 @@ def _true(x):
     return True
 
 
+def _libc_from_python(self):
+    return spack.spec.Spec("glibc@=2.28")
+
+
 @pytest.fixture()
 def do_not_check_runtimes_on_reuse(monkeypatch):
     monkeypatch.setattr(spack.solver.asp, "_has_runtime_dependencies", _true)
@@ -2066,8 +2068,11 @@ def do_not_check_runtimes_on_reuse(monkeypatch):
 def _c_compiler_always_exists():
     fn = spack.solver.asp.c_compiler_runs
     spack.solver.asp.c_compiler_runs = _true
+    mthd = spack.compilers.environment.LibcDetector.default_libc
+    spack.compilers.environment.LibcDetector.default_libc = _libc_from_python
     yield
     spack.solver.asp.c_compiler_runs = fn
+    spack.compilers.environment.LibcDetector.default_libc = mthd
 
 
 @pytest.fixture(scope="session")
