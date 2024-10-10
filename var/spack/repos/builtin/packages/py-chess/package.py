@@ -18,7 +18,7 @@ class PyChess(PythonPackage):
     version("1.11.0", sha256="3c63cace177860987705b71dedcfab63fb1065186799a06db7eccd76e833b279")
 
     # Python version requirement
-    depends_on('python@3.8:', type=('build', 'run'))
+    depends_on("python@3.8:", type=("build", "run"))
 
     # Main dependencies
-    depends_on('py-setuptools', type='build')
+    depends_on("py-setuptools", type="build")
